@@ -403,4 +403,16 @@ Tensor FunctionalInverses::alias_copy_inverse(const Tensor& base, const Tensor& 
     }
 }
 
+Tensor FunctionalInverses::narrow_copy_inverse(const at::Tensor & base, const at::Tensor & mutated_view, bool reapply_views, bool called_by_functionalization, int dim, c10::SymInt start, c10::SymInt length) {
+    if (reapply_views && !called_by_functionalization) {
+      // NB: assumes mutated_view is a narrowed view of base.
+      // We should NOT do this for functionalization
+      return mutated_view.as_strided_symint(
+          base.sym_sizes(), base.sym_strides(), base.sym_storage_offset());
+    } else {
+      return base.slice_scatter_symint(
+          mutated_view, dim, std::move(start), start + length, 1);
+    }
+}
+
 } // namespace at::functionalization
