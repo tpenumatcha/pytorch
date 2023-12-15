@@ -68,6 +68,17 @@ reapply_views_binding = Binding(
     ),
     default=None,
 )
+called_by_functionalization_binding = Binding(
+    name="called_by_functionalization",
+    nctype=NamedCType(name="called_by_functionalization", type=BaseCType(boolT)),
+    argument=Argument(
+        name="called_by_functionalization",
+        type=BaseType(BaseTy.bool),
+        default=None,
+        annotation=None,
+    ),
+    default=None,
+)
 
 
 # The lambda capture itself doesn't have a name.
@@ -115,7 +126,11 @@ def capture_arguments(func: FunctionSchema, *, is_reverse: bool) -> List[Binding
     non_self_value_bindings = [
         dispatcher.argument(a, remove_non_owning_ref_types=True) for a in non_self_args
     ]
-    all_bindings = [reapply_views_binding] + non_self_value_bindings
+
+    all_bindings = [reapply_views_binding]
+    if is_reverse:
+        all_bindings.append(called_by_functionalization_binding)
+    all_bindings.extend(non_self_value_bindings)
     return all_bindings
 
 
@@ -166,6 +181,7 @@ def inner_arguments(func: FunctionSchema, is_reverse: bool) -> List[Binding]:
                 base_binding,
                 mutated_view_binding,
                 reapply_views_binding,
+                called_by_functionalization_binding,
                 index_binding,
             ] + non_self_bindings
         else:
@@ -173,4 +189,5 @@ def inner_arguments(func: FunctionSchema, is_reverse: bool) -> List[Binding]:
                 base_binding,
                 mutated_view_binding,
                 reapply_views_binding,
+                called_by_functionalization_binding,
             ] + non_self_bindings
