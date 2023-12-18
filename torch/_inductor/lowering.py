@@ -2063,6 +2063,7 @@ def sdpa_constraint(fx_node, *args, **kwargs):
         is_backward = fx_node.target in (
             aten._scaled_dot_product_efficient_attention_backward.default,
             aten._scaled_dot_product_flash_attention_backward.default,
+            aten._scaled_dot_product_flash_attention_mask_backward.default,
         )
 
         def is_aligned(x):
@@ -2121,6 +2122,16 @@ make_fallback(
 )
 make_fallback(
     aten._scaled_dot_product_flash_attention_backward.default,
+    sdpa_constraint,
+    warn=False,
+)
+make_fallback(
+    aten._scaled_dot_product_flash_attention_mask.default,
+    sdpa_constraint,
+    warn=False,
+)
+make_fallback(
+    aten._scaled_dot_product_flash_attention_mask_backward.default,
     sdpa_constraint,
     warn=False,
 )
