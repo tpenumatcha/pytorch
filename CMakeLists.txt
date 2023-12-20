@@ -732,8 +732,6 @@ if(MSVC)
   append_cxx_flag_if_supported("/utf-8" CMAKE_CXX_FLAGS)
 endif()
 
-include(cmake/Dependencies.cmake)
-
 # Moved this cmake set option down here because CMAKE_CUDA_COMPILER_VERSION is not avaialble until now
 # TODO: Merge this into cmake_dependent_option as "NOT MSVC AND (USE_CUDA OR USE_ROCM)"
 #       once cmake_minimum_required is bumped to 3.22
@@ -756,6 +754,8 @@ cmake_dependent_option(
   USE_MEM_EFF_ATTENTION
   "Enable memory-efficient attention for scaled dot product attention" ON
   "USE_CUDA AND NOT ROCM AND NOT CMAKE_CUDA_COMPILER_VERSION VERSION_LESS 11.6" OFF)
+
+include(cmake/Dependencies.cmake)
 
 if(DEBUG_CUDA)
   string(APPEND CMAKE_CUDA_FLAGS_DEBUG " -lineinfo")
